@@ -30,8 +30,7 @@ function wiki_info()
 		"author"		=> "Jones",
 		"authorsite"	=> "http://jonesboard.de/",
 		"version"		=> "1.2.2",
-		"guid" 			=> "0b842d4741fc27e460013732dd5d6d52",
-		"compatibility" => "16*"
+		"compatibility" => "18*"
 	);
 }
 
@@ -52,9 +51,6 @@ function wiki_install()
         flash_message($lang->wiki_pl_old, "error");
         admin_redirect("index.php?module=config-plugins");
     }
-
-	wiki_settings(true);
-	wiki_templates(true);
 
 	$col = $db->build_create_table_collation();
 	$db->query("CREATE TABLE `".TABLE_PREFIX."wiki` (
@@ -161,6 +157,9 @@ function wiki_uninstall()
 
 function wiki_activate()
 {
+	wiki_settings();
+	wiki_templates();
+
 	require MYBB_ROOT."inc/adminfunctions_templates.php";
 	find_replace_templatesets("header", "#".preg_quote('<li><a href="{$mybb->settings[\'bburl\']}/search.php"><img src="{$theme[\'imgdir\']}/toplinks/search.gif" alt="" title="" />{$lang->toplinks_search}</a></li>')."#i", '<li><a href="{$mybb->settings[\'bburl\']}/search.php"><img src="{$theme[\'imgdir\']}/toplinks/search.gif" alt="" title="" />{$lang->toplinks_search}</a></li><li><a href="{$mybb->settings[\'bburl\']}/{$wiki_link}"><img src="{$theme[\'imgdir\']}/toplinks/wiki.gif" alt="" title="" />{$lang->wiki}</a></li>');
 	find_replace_templatesets("footer", "#".preg_quote('<!-- End powered by -->')."#i", '{$wiki_copyright}<!-- End powered by -->');
@@ -864,7 +863,7 @@ function wiki_update($installed, $uploaded)
 	    wiki_cache_update("permissions");
 }
 
-function wiki_settings($install=false)
+function wiki_settings()
 {
     global $PL;
 	$PL->settings("wiki",
@@ -917,7 +916,7 @@ both=Both",
     );
 }
 
-function wiki_templates($install=false)
+function wiki_templates()
 {
     global $PL;
     $PL->templates("wiki",
