@@ -620,32 +620,6 @@ function wiki_create_navy($cat, $article = false, $categories = false)
 	}
 }
 
-/*
-Paul's Simple Diff Algorithm v 0.1
-(C) Paul Butler 2007 <http://www.paulbutler.org/>
-May be used and distributed under the zlib/libpng license. */
-
-function diff($old, $new){
-	foreach($old as $oindex => $ovalue){
-		$nkeys = array_keys($new, $ovalue);
-			foreach($nkeys as $nindex){
-			$matrix[$oindex][$nindex] = isset($matrix[$oindex - 1][$nindex - 1]) ?
-			$matrix[$oindex - 1][$nindex - 1] + 1 : 1;
-			if($matrix[$oindex][$nindex] > $maxlen){
-				$maxlen = $matrix[$oindex][$nindex];
-				$omax = $oindex + 1 - $maxlen;
-				$nmax = $nindex + 1 - $maxlen;
-			}
-		}
-	}
-	if($maxlen == 0) return array(array('d'=>$old, 'i'=>$new));
-	return array_merge(
-		diff(array_slice($old, 0, $omax), array_slice($new, 0, $nmax)),
-		array_slice($new, $nmax, $maxlen),
-		diff(array_slice($old, $omax + $maxlen), array_slice($new, $nmax + $maxlen)));
-}
-
-
 function getsort($url, $name="sort")
 {
 	global $mybb, $lang, $templates, $theme;
@@ -866,6 +840,7 @@ function wiki_update($installed, $uploaded)
 function wiki_settings()
 {
     global $PL;
+	$PL or require_once PLUGINLIBRARY;
 	$PL->settings("wiki",
 	  	"Wiki",
 	  	"Settings for the \"Wiki\" Plugin",
@@ -1821,12 +1796,12 @@ function wiki_templates()
 	<title>{\$settings['bbname']} - {\$lang->wiki_versions_diff}</title>
 	{\$headerinclude}
 	<style type=\"text/css\">
-		.wiki-diff-deleted {
+		del {
 			text-decoration: line-through;
 			background-color: #ffaaaa;
 		}
 
-		.wiki-diff-inserted {
+		ins {
 			background-color: #aaffaa;
 		}
 	</style>
@@ -1901,4 +1876,3 @@ function wiki_templates()
                        )
         );
 }
-?>

@@ -688,25 +688,17 @@ if($mybb->input['action']=="version_diff") {
 
 		$lang->wiki_versions_diff_between = $lang->sprintf($lang->wiki_versions_diff_between, $v1['entry']['date'], $v2['entry']['date']);
 
-		$v1['entry']['text'] = explode(' ', $v1['entry']['text']);
-		$v2['entry']['text'] = explode(' ', $v2['entry']['text']);
+		$v1['entry']['text'] = explode("\n", $v1['entry']['text']);
+		$v2['entry']['text'] = explode("\n", $v2['entry']['text']);
 
-		$diff = diff($v2['entry']['text'], $v1['entry']['text']);
+		require_once MYBB_ROOT."inc/3rdparty/diff/Diff.php";
+		require_once MYBB_ROOT."inc/3rdparty/diff/Diff/Renderer.php";
+		require_once MYBB_ROOT."inc/3rdparty/diff/Diff/Renderer/Inline.php";
 
-		$diffStr = '';
+		$diff = new Horde_Text_Diff('auto', array($v1['entry']['text'], $v2['entry']['text']));
+		$renderer = new Horde_Text_Diff_Renderer_Inline();
 
-		foreach($diff as $segment) {
-			if(is_array($segment)) {
-				if(count($segment['d']))
-					$diffStr .= '<span class="wiki-diff-deleted">'.nl2br(htmlspecialchars_uni(implode(' ', $segment['d']))).'</span>';
-
-				if(count($segment['i']))
-					$diffStr .= '<span class="wiki-diff-inserted">'.nl2br(htmlspecialchars_uni(implode(' ', $segment['i']))).'</span>';
-			} else {
-				$diffStr .= nl2br(htmlspecialchars_uni($segment));
-			}
-		}
-		$diff = $diffStr;
+		$diff = $renderer->render($diff);
 
 		foreach($versions as $version) {
 			if($version['wid'] != $wid)
@@ -1312,6 +1304,9 @@ if(!isset($mybb->input['action']) || $mybb->input['action']=="show") {
 
 				if(wiki_is_allowed("can_edit"))
 					eval("\$additional['control'] = \"".$templates->get("wiki_control")."\";");
+				
+				$wiki_table or $wiki_table = eval($templates->render('wiki_table_empty'));
+
 				eval("\$wiki_category = \"".$templates->get("wiki_table")."\";");
 				unset($wiki_table);
 			}
@@ -1593,9 +1588,10 @@ if(!isset($mybb->input['action']) || $mybb->input['action']=="show") {
 		if($num > 0)
 			$sort = getsort($link);
 
+		$wiki_table or $wiki_table = eval($templates->render('wiki_table_empty'));
+
 		eval("\$wiki_category = \"".$templates->get("wiki_table")."\";");
 		eval("\$showwiki = \"".$templates->get("wiki")."\";");
 	}
 	output_page($showwiki);
 }
-?>

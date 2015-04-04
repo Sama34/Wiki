@@ -163,4 +163,5 @@ $l['wiki_closed'] = "This Entry is closed.";
 $l['confirm_delete_wiki'] = "Are you sure you wish to delete this entry?";
 $l['confirm_delete_category'] = "Are you sure you wish to delete this category?";
 $l['wiki_copy'] = "Wiki by";
-?>
+
+$l['wiki_table_empty'] = 'There is currently no data to show at this moment.';
